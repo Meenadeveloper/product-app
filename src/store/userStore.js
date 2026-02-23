@@ -5,13 +5,35 @@ import { getProfile } from "@/services/propertyAPI";
 
 const useUserStore = create((set) => ({
   profile: null,
+  loading: false,
+  error: null,
 
   fetchProfile: async () => {
+     set({ loading: true, error: null });
     try {
       const data = await getProfile();
-      set({ profile: data?.data || data });
+      set({ profile: data?.data || data , loading: false });
+      console.log("Profile fetched successfully", data);
     } catch (error) {
-      console.error("Profile fetch failed");
+            set({ error: error.message, loading: false });
+
+      console.error("Profile fetch failed", error);
+    }
+  },
+
+   updateProfile: async (profileData) => {
+    set({ loading: true, error: null });
+    try {
+      await updateProfile(profileData);
+      set({ loading: false });
+      // Optionally, refetch profile to sync
+      await getProfile().then((data) => set({ profile: data }));
+    } catch (error) {
+      set({
+        error: error.message || "Failed to update profile",
+        loading: false,
+      });
+      throw error;
     }
   },
 

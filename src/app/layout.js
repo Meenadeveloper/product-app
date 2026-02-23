@@ -4,13 +4,15 @@ import "../styles/css/colors.css";
 import Header from "@/components/ui/Header";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Footer from "@/components/ui/footer";
+// import "@/lib/disableConsole";
 export const metadata = {
   title: "Unicorn Real Estate",
   description: "Find properties in Qatar - Buy, Rent, Sell",
 };
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
        
         suppressHydrationWarning
@@ -18,7 +20,7 @@ export default function RootLayout({ children }) {
           <ToastContainer position="top-right" />
         <Header />
         {children}
-       
+       <Footer/>
       </body>
     </html>
   );

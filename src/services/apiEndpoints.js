@@ -1,6 +1,8 @@
 const BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ||
-  "https://www.lowcommissionqatar.com/backend/api/";
+  typeof window !== "undefined"
+    ? ""
+    : process.env.NEXT_PUBLIC_API_BASE_URL ||
+      "https://www.lowcommissionqatar.com/backend/api/";
 
 export const API_ENDPOINTS = {
   REGISTER: `${BASE_URL}register`,
@@ -30,5 +32,7 @@ export const API_ENDPOINTS = {
   FEATURE_PROPERTY_LIST: `${BASE_URL}user/featured-list`,
   CAREER_FORM_SUBMIT: `${BASE_URL}career`,
   PROPERTY_SUGGESTION: `${BASE_URL}user/property-suggesstion`,
+
+  SEO: `${BASE_URL}seo`,
 
 };

@@ -11,6 +11,7 @@ import {
 import useUserStore from "@/store/userStore";
 import { fetchFilterMaster } from "@/services/propertyAPI";
 import FabMenu from "./FabMenu";
+import LoginModel from "./LoginModel";
 
 const Header = ({ transparent = false }) => {
   const router = useRouter();
@@ -25,11 +26,20 @@ const Header = ({ transparent = false }) => {
   const [toggle, setToggle] = useState(false);
   const [userMenu, setUserMenu] = useState(false);
   const [windowWidth, setWindowWidth] = useState(0);
+  const [login, setLogin] = useState(false);
 
   /* ---------------- TOKEN CHECK ---------------- */
 
+  const getCookie = (name) => {
+    if (typeof document === "undefined") return "";
+    const match = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith(`${name}=`));
+    return match ? decodeURIComponent(match.split("=")[1]) : "";
+  };
+
   useEffect(() => {
-    const token = localStorage.getItem("access_token");
+    const token = getCookie("access_token");
     setHasToken(!!token);
   }, []);
 
@@ -89,8 +99,12 @@ const Header = ({ transparent = false }) => {
   /* ---------------- LOGOUT ---------------- */
 
   const handleLogout = () => {
-    localStorage.removeItem("access_token");
+    if (typeof document !== "undefined") {
+      document.cookie =
+        "access_token=; path=/; max-age=0; samesite=lax";
+    }
     clearUser();
+    setHasToken(false);
     router.push("/");
   };
 
@@ -185,7 +199,7 @@ const Header = ({ transparent = false }) => {
                   <li>
                     {hasToken ? (
                       <Link href="/user/my-profile">
-                        <img src="/images/user.png" alt="profile" />
+                        <img src="/images/placeholder.png" alt="profile" />
                       </Link>
                     ) : (
                       <button
@@ -290,7 +304,7 @@ const Header = ({ transparent = false }) => {
                               }}
                             >
                               <img
-                                src={profile?.profile_url || user}
+                                src={profile?.profile_url || "/images/user.png"}
                                 className=""
                                 alt=""
                                 style={{
@@ -306,15 +320,15 @@ const Header = ({ transparent = false }) => {
                             className="dropdown-menu pull-right animated flipInX"
                             style={{ display: userMenu ? "block" : "none" }}
                           >
-                            <Link to="/user/my-profile">
+                            <Link href="/user/my-profile">
                               <i className="fa-solid fa-address-card"></i>My
                               Profile
                             </Link>
-                            <Link to="/user/wishlist">
+                            <Link href="/user/wishlist">
                               <i className="fa-solid fa-bookmark"></i>Wishlist
                               Property
                             </Link>
-                            <Link to="/user/change-password">
+                            <Link href="/user/change-password">
                               <i className="fa-solid fa-unlock"></i>Change
                               Password
                             </Link>
@@ -347,6 +361,14 @@ const Header = ({ transparent = false }) => {
     </header>
 
      <div className="clearfix"></div>
+
+      {/* Login Modal */}
+      {login && (
+        <LoginModel
+          onClose={() => setLogin(false)}
+          onSuccess={() => setHasToken(true)}
+        />
+      )}
     </>
   );
 };

@@ -1,3 +1,5 @@
+@import "@fortawesome/fontawesome-free/css/all.min.css";
+
 /*
 * Theme Name: unicorn - Real Estate Template
 * Author: Shreethemes
@@ -5587,20 +5589,18 @@ span.tag_t {
     flex: 0 0 33.333333%;
     max-width:33.333333%;
 }
-.avl-features li:before {
-    content:"\f058";
-    font-family:"Font Awesome 6 Free";
+.avl-features-icon {
     position: absolute;
-    color: #041E27;
+    left: 0;
+    top: 5px;
     width: 20px;
     height: 20px;
     background: rgb(150 86 0 / 10%);
-    text-align: center;
-    line-height: 20px;
+    color: #041E27;
     border-radius: 50%;
-    left: 0;
-    top: 5px;
-    font-size: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 .dw-proprty-info li {
     display: block;
@@ -6628,8 +6628,8 @@ ul.like_share_list li button i{
     font-size: 16px;
 }
 .property_block_wrap.style-2 .property_block_wrap_header h4:after {
-    font-family: "Font Awesome 5 Free";
-    content: "\f106";
+    font-family: inherit;
+    content: "";
     position: relative;
     float: right;
     margin-right: 0px;
@@ -6642,6 +6642,24 @@ ul.like_share_list li button i{
     display: flex;
     align-items: center;
     justify-content: center;
+    display: none;
+}
+
+.property_block_wrap.style-2 .property_block_wrap_header h4 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.property_block_wrap_icon {
+    display: inline-flex;
+    align-items: center;
+    transition: transform 0.2s ease-out;
+    transform: rotate(180deg);
+}
+
+.property_block_wrap_header .collapsed .property_block_wrap_icon {
+    transform: rotate(0deg);
 }
 .property_block_wrap.style-2 .property_block_wrap_header .collapsed h4:after {
     transform: rotate(180deg);
@@ -10810,10 +10828,14 @@ th.next.available, .prev.available {
 		max-width: 700px;
 		margin: 100px auto 30px;
 	}
+@media (min-width: 992px) {
 	.side_stiky {
-		position: sticky;
+		position: sticky !important;
 		top: 100px;
+		align-self: flex-start;
+		height: fit-content;
 	}
+}
 	.header.header-fixed {
 	box-shadow: 0 5px 30px rgba(0, 22, 84, 0.1);
 	-webkit-box-shadow: 0 5px 30px rgba(0, 22, 84, 0.1);

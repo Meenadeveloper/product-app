@@ -1,157 +1,231 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
+import { cache } from "react";
+import axiosInstance from "@/services/axiosInstance";
 import { API_ENDPOINTS } from "@/services/apiEndpoints";
 import { formatPrice } from "@/utils/formatPrice";
-import PropertyDetail from "@/components/property/PropertyDetail";
-import DetailSidebar from "@/components/property/DetailSidebar";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
+import { getProperty } from "@/lib/getProperty";
+import { getSEO } from "@/lib/getSEO";
 import ApartmentIcon from "@mui/icons-material/Apartment";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import { cookies } from "next/headers";
+import PropertyDetailClient from "@/components/property/PropertyDetailClient";
+import DetailSidebar from "@/components/property/DetailSidebar";
+import PropertyGalleryClient from "@/components/property/PropertyGalleryClient";
 
-/* -----------------------------
-   Fetch Property (Server Side)
------------------------------- */
-async function getProperty(id) {
-  try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}${API_ENDPOINTS.PROPERTY_DETAIL}/${id}`,
-      {
-        cache: "no-store", // or revalidate: 60
-      }
-    );
 
-    if (!res.ok) return null;
 
-    const data = await res.json();
-    return data?.data || null;
-  } catch (error) {
-    return null;
-  }
-}
 
-/* -----------------------------
-   Dynamic SEO (MNC Level)
------------------------------- */
-export async function generateMetadata({ params }) {
-  const property = await getProperty(params.id);
 
-  if (!property) {
+
+
+
+/* ---------------------------------
+   Cache only the SEO fetch
+---------------------------------- */
+const getCachedSEO = cache(async (pageKey) => {
+  return await getSEO(pageKey);
+});
+
+/* ---------------------------------
+   Proper Next.js generateMetadata
+---------------------------------- */
+
+export async function generateMetadata(props) {
+    const resolvedParams = await props.params;   // ✅ MUST unwrap
+  const id = resolvedParams.id;               // ✅ safe
+  const slug = resolvedParams.slug; 
+
+  const pageKey = `property_detail_${id}`;
+
+  const seo = await getCachedSEO(pageKey);
+  console.log("SEO data:", seo); // Debug log
+
+  if (!seo) {
     return {
-      title: "Property Not Found",
+      title: "Property Details",
+      description: "View property details",
     };
   }
 
   const image =
-    property?.property_images?.[0] || property?.thumbnail || "";
+    seo.image?.startsWith("http")
+      ? seo.image
+      : `${process.env.NEXT_PUBLIC_SITE_URL}${seo.image}`;
+
+  const url =
+    seo.url ||
+    `${process.env.NEXT_PUBLIC_SITE_URL}/property/${params.id}/${params.title}`;
 
   return {
-    title: property.title,
-    description: `${property.title} located at ${property.address}. Price: ${property.property_price}`,
-    openGraph: {
-      title: property.title,
-      description: property.address,
-      images: [image],
-      url: `${process.env.NEXT_PUBLIC_SITE_URL}/property/${params.id}/${params.title}`,
+    title: seo.title,
+    description: seo.description,
+    keywords: seo.key,
+
+    alternates: {
+      canonical: url,
     },
+
+    openGraph: {
+      title: seo.title,
+      description: seo.description,
+      url,
+      type: "website",
+      siteName: "Unicorn App",
+      images: [
+        {
+          url: image,
+          width: 1200,
+          height: 630,
+        },
+      ],
+    },
+
     twitter: {
       card: "summary_large_image",
-      title: property.title,
+      title: seo.title,
+      description: seo.description,
       images: [image],
     },
   };
 }
 
-/* -----------------------------
-   Page Component (Server)
------------------------------- */
-export default async function PropertyPage({ params }) {
-  const property = await getProperty(params.id);
+/* =====================================================
+   3️⃣  Property Page Component
+===================================================== */
 
-  if (!property) return notFound();
+export default async function PropertyPage(props) {
+  const resolvedParams = await props.params;   // ✅ MUST unwrap
+  const id = resolvedParams.id;               // ✅ safe
+  const slug = resolvedParams.slug;   
 
-  const images = property?.property_images || [];
+   const cookieStore = await cookies();
+  const token = cookieStore.get("access_token")?.value || null;
+  console.log("Token:", token);
+
+  const property = await getProperty(id);
+  console.log("Property data:", property);
+
+  if (!property) {
+    notFound();
+  }
+
+
+  
 
   return (
-    <>
-      {/* Gallery */}
-      <div className="featured_slick_gallery gray">
+  <>
+  
+  
+ <PropertyGalleryClient images={property.property_images} />
+  
+   <section className="gray-simple">
         <div className="container">
           <div className="row">
-            {images.map((img, index) => (
-              <div key={index} className="col-md-6 mb-3">
-                <div style={{ position: "relative", height: 400 }}>
-                  <Image
-                    src={img}
-                    alt={`property-${index}`}
-                    fill
-                    style={{ objectFit: "cover" }}
-                    priority={index === 0}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Content */}
-      <section className="gray-simple">
-        <div className="container">
-          <div className="row">
-
-            {/* Left Content */}
-            <div className="col-lg-8">
+            <div className="col-lg-8 col-md-12 col-sm-12">
               <div className="property_block_wrap style-2 p-4">
+                <div className="prt-detail-title-desc">
+                  <span className="label text-light bg-success">
+                    For {property?.offering_type?.name}
+                  </span>
 
-                <span className="label text-light bg-success">
-                  For {property?.offering_type?.name}
-                </span>
-
-                <h1 className="mt-3">{property?.title}</h1>
-
-                <div className="d-flex align-items-center">
-                  <LocationOnIcon sx={{ color: "red", mr: 1 }} />
-                  {property?.address}
-                </div>
-
-                <h2 className="text-primary mt-3">
-                  {formatPrice(property?.property_price, { withCurrency: true })}
-                </h2>
-
-                <div className="list-fx-features mt-3">
-
-                  {property?.rooms && (
-                    <div>{property.rooms} Bedrooms</div>
+                  {property?.property_type?.name && (
+                    <span
+                      className="label text-light bg-success"
+                      style={{ marginLeft: 10 }}
+                    >
+                      Type : {property?.property_type?.name}
+                    </span>
                   )}
 
-                  {property?.bothrooms && (
-                    <div>{property.bothrooms} Bathrooms</div>
-                  )}
+                  <h3 className="mt-3">
+                    {property?.title ? property?.title : "N/A"}
+                  </h3>
+                  <span className="d-flex align-items-center">
+                    <LocationOnIcon
+                      style={{ fontSize: 20, color: "red", marginRight: 6 }}
+                    />
+                    {property?.address}
+                  </span>
 
-                  {property?.property_size && (
-                    <div>{property.property_size} Sqft</div>
-                  )}
+                  <h3 className="prt-price-fix text-primary mt-2">
+                   {/* {property?.property_price}  */}
+                    {formatPrice(property?.property_price, { withCurrency: true })}
+                  </h3>
 
-                  {property?.total_floors && (
-                    <div className="d-flex align-items-center">
-                      <ApartmentIcon sx={{ mr: 1 }} />
-                      {property.total_floors} Floors
-                    </div>
-                  )}
+                  <span className="label text-light bg-success mt-2">
+                    For {property?.category?.name}
+                  </span>
 
+                  <div className="list-fx-features mt-3">
+                    {property?.rooms && (
+                      <div className="listing-card-info-icon">
+                        <div className="inc-fleat-icon me-1">
+                          <img src="/images/bed.svg" width="13" alt="" />
+                        </div>
+                        {property?.rooms} Bedrooms
+                      </div>
+                    )}
+
+                    {property?.bothrooms && (
+                      <div className="listing-card-info-icon">
+                        <div className="inc-fleat-icon me-1">
+                          <img src="/images/bathtub.svg" width="13" alt="" />
+                        </div>
+                        {property?.bothrooms} Bathrooms
+                      </div>
+                    )}
+
+                    {property?.property_size && (
+                      <div className="listing-card-info-icon">
+                        <div className="inc-fleat-icon me-1">
+                          <img src="/images/move.svg" width="13" alt="" />
+                        </div>
+                        {property?.property_size} Size
+                      </div>
+                    )}
+
+                    {property?.land_size && (
+                      <div className="listing-card-info-icon">
+                        <div className="inc-fleat-icon me-1">
+                          <img src="/images/move.svg" width="13" alt="" />
+                        </div>
+                        {property?.land_size} Sqft
+                      </div>
+                    )}
+
+                    {property?.total_floors && (
+                      <div className="listing-card-info-icon d-flex align-items-center">
+                        <ApartmentIcon
+                          style={{ fontSize: 18, marginRight: 6 }}
+                        />
+                        <span>{property?.total_floors} Floors</span>
+                      </div>
+                    )}
+                  </div>
+                  {/* {property?.view_count > 0 && (
+                    <span className="label text-light bg-success mt-2">
+                      Visited Count {property?.view_count}
+                    </span>
+                  )} */}
                 </div>
               </div>
 
-              {/* <PropertyDetail data={property} /> */}
+              <PropertyDetailClient
+      data={property}
+      propertyId={id}
+      token={token}
+    />
+
             </div>
 
-            {/* Sidebar */}
-            <div className="col-lg-4">
-              {/* <DetailSidebar data={property} /> */}
+            <div className="col-lg-4 col-md-12 col-sm-12">
+              <DetailSidebar data={property}  propertyId={id}
+      token={token}/>
             </div>
-
           </div>
         </div>
       </section>
-    </>
+  </>
   );
 }
