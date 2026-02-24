@@ -1,3 +1,18 @@
+/* Plugins */
+@import "../styles/css/plugins/animation.css";
+@import "../styles/css/plugins/css/bootstrap.min.css";
+@import "../styles/css/plugins/date-picker.css";
+@import "../styles/css/plugins/ion.rangeSlider.min.css";
+@import "../styles/css/plugins/dropzone.css";
+@import "../styles/css/plugins/select2.css";
+@import "../styles/css/plugins/slick.css";
+@import "../styles/css/plugins/slick-theme.css";
+@import "../styles/css/plugins/magnific-popup.css";
+
+/* Your custom styles */
+@import "../styles/css/colors.css";
+
+@import "../styles/css/styles.css";
 
 
 html,

@@ -23,20 +23,11 @@ export default function LoginModel({ onClose, onSuccess }) {
 
   const togglePassword = () => setShowPassword((prev) => !prev);
 
-  const setAuthCookie = (token) => {
-    if (typeof document === "undefined") return;
-    const secure = window.location.protocol === "https:" ? "; secure" : "";
-    document.cookie = `access_token=${encodeURIComponent(
-      token
-    )}; path=/; max-age=604800; samesite=lax${secure}`;
-  };
-
   const onSubmit = async (data) => {
     setLoading(true);
     setServerError("");
     try {
       const response = await loginUser(data);
-      setAuthCookie(response?.token);
       toast.success(response?.message || "Login successful");
       onClose?.();
       onSuccess?.();

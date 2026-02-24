@@ -10,6 +10,8 @@ import {
 
 import useUserStore from "@/store/userStore";
 import { fetchFilterMaster } from "@/services/propertyAPI";
+import axiosInstance from "@/services/axiosInstance";
+import { API_ENDPOINTS } from "@/services/apiEndpoints";
 import FabMenu from "./FabMenu";
 import LoginModel from "./LoginModel";
 
@@ -30,26 +32,19 @@ const Header = ({ transparent = false }) => {
 
   /* ---------------- TOKEN CHECK ---------------- */
 
-  const getCookie = (name) => {
-    if (typeof document === "undefined") return "";
-    const match = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith(`${name}=`));
-    return match ? decodeURIComponent(match.split("=")[1]) : "";
-  };
-
   useEffect(() => {
-    const token = getCookie("access_token");
-    setHasToken(!!token);
-  }, []);
-
-  /* ---------------- FETCH PROFILE ---------------- */
-
-  useEffect(() => {
-    if (hasToken) {
-      fetchProfile();
-    }
-  }, [hasToken]);
+    let isMounted = true;
+    const checkAuth = async () => {
+      const result = await fetchProfile();
+      if (isMounted) {
+        setHasToken(!!result?.ok);
+      }
+    };
+    checkAuth();
+    return () => {
+      isMounted = false;
+    };
+  }, [fetchProfile]);
 
   /* ---------------- FETCH MENU ---------------- */
 
@@ -98,14 +93,16 @@ const Header = ({ transparent = false }) => {
 
   /* ---------------- LOGOUT ---------------- */
 
-  const handleLogout = () => {
-    if (typeof document !== "undefined") {
-      document.cookie =
-        "access_token=; path=/; max-age=0; samesite=lax";
+  const handleLogout = async () => {
+    try {
+      await axiosInstance.post(API_ENDPOINTS.LOGOUT);
+    } catch (error) {
+      console.error("Logout failed", error);
+    } finally {
+      clearUser();
+      setHasToken(false);
+      router.push("/");
     }
-    clearUser();
-    setHasToken(false);
-    router.push("/");
   };
 
   /* ---------------- MENU CLICK ---------------- */
@@ -181,7 +178,7 @@ const Header = ({ transparent = false }) => {
                   display: "block", // helps with layout
                   alignItems: "center",
                 }}>
-            <img src="/images/logo.png" alt="Logo"   style={{
+            <img src="/property/images/logo.png" alt="Logo"   style={{
                     maxHeight: "80px", // controls height of logo
                     maxWidth: "200px", // prevents horizontal overflow
                     width:"100%",
@@ -199,7 +196,7 @@ const Header = ({ transparent = false }) => {
                   <li>
                     {hasToken ? (
                       <Link href="/user/my-profile">
-                        <img src="/images/placeholder.png" alt="profile" />
+                        <img src="/property/images/placeholder.png" alt="profile" />
                       </Link>
                     ) : (
                       <button
@@ -304,7 +301,7 @@ const Header = ({ transparent = false }) => {
                               }}
                             >
                               <img
-                                src={profile?.profile_url || "/images/user.png"}
+                                src={profile?.profile_url || "/property/images/user.png"}
                                 className=""
                                 alt=""
                                 style={{
@@ -366,7 +363,10 @@ const Header = ({ transparent = false }) => {
       {login && (
         <LoginModel
           onClose={() => setLogin(false)}
-          onSuccess={() => setHasToken(true)}
+          onSuccess={async () => {
+            setHasToken(true);
+            await fetchProfile();
+          }}
         />
       )}
     </>
@@ -374,3 +374,4 @@ const Header = ({ transparent = false }) => {
 };
 
 export default Header;
+

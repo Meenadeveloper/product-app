@@ -30,7 +30,7 @@ const FabMenu = () => {
           style={{ display: "flex", alignItems: "center", gap: "10px" }}
         >
           <Image
-            src="/images/agency-1.png"
+            src="/property/images/agency-1.png"
             alt="Advertise"
             width={30}
             height={30}
@@ -54,7 +54,7 @@ const FabMenu = () => {
           style={{ display: "flex", alignItems: "center", gap: "10px" }}
         >
           <Image
-            src="/images/job.png"
+            src="/property/images/job.png"
             alt="Career"
             width={30}
             height={30}

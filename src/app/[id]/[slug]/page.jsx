@@ -8,17 +8,9 @@ import { getProperty } from "@/lib/getProperty";
 import { getSEO } from "@/lib/getSEO";
 import ApartmentIcon from "@mui/icons-material/Apartment";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
-import { cookies } from "next/headers";
 import PropertyDetailClient from "@/components/property/PropertyDetailClient";
 import DetailSidebar from "@/components/property/DetailSidebar";
 import PropertyGalleryClient from "@/components/property/PropertyGalleryClient";
-
-
-
-
-
-
-
 
 /* ---------------------------------
    Cache only the SEO fetch
@@ -32,9 +24,9 @@ const getCachedSEO = cache(async (pageKey) => {
 ---------------------------------- */
 
 export async function generateMetadata(props) {
-    const resolvedParams = await props.params;   // ✅ MUST unwrap
-  const id = resolvedParams.id;               // ✅ safe
-  const slug = resolvedParams.slug; 
+  const resolvedParams = await props.params; // ✅ MUST unwrap
+  const id = resolvedParams.id; // ✅ safe
+  const slug = resolvedParams.slug;
 
   const pageKey = `property_detail_${id}`;
 
@@ -61,7 +53,7 @@ export async function generateMetadata(props) {
     title: seo.title,
     description: seo.description,
     keywords: seo.key,
-
+    tag : seo.tags,
     alternates: {
       canonical: url,
     },
@@ -69,6 +61,8 @@ export async function generateMetadata(props) {
     openGraph: {
       title: seo.title,
       description: seo.description,
+      keywords: seo.key,
+    tag : seo.tags,
       url,
       type: "website",
       siteName: "Unicorn App",
@@ -95,13 +89,9 @@ export async function generateMetadata(props) {
 ===================================================== */
 
 export default async function PropertyPage(props) {
-  const resolvedParams = await props.params;   // ✅ MUST unwrap
-  const id = resolvedParams.id;               // ✅ safe
-  const slug = resolvedParams.slug;   
-
-   const cookieStore = await cookies();
-  const token = cookieStore.get("access_token")?.value || null;
-  console.log("Token:", token);
+  const resolvedParams = await props.params; // ✅ MUST unwrap
+  const id = resolvedParams.id; // ✅ safe
+  const slug = resolvedParams.slug;
 
   const property = await getProperty(id);
   console.log("Property data:", property);
@@ -110,16 +100,11 @@ export default async function PropertyPage(props) {
     notFound();
   }
 
-
-  
-
   return (
-  <>
-  
-  
- <PropertyGalleryClient images={property.property_images} />
-  
-   <section className="gray-simple">
+    <>
+      <PropertyGalleryClient images={property.property_images} />
+
+      <section className="gray-simple">
         <div className="container">
           <div className="row">
             <div className="col-lg-8 col-md-12 col-sm-12">
@@ -149,7 +134,7 @@ export default async function PropertyPage(props) {
                   </span>
 
                   <h3 className="prt-price-fix text-primary mt-2">
-                   {/* {property?.property_price}  */}
+                    {/* {property?.property_price}  */}
                     {formatPrice(property?.property_price, { withCurrency: true })}
                   </h3>
 
@@ -161,7 +146,7 @@ export default async function PropertyPage(props) {
                     {property?.rooms && (
                       <div className="listing-card-info-icon">
                         <div className="inc-fleat-icon me-1">
-                          <img src="/images/bed.svg" width="13" alt="" />
+                          <img src="/property/images/bed.svg" width="13" alt="" />
                         </div>
                         {property?.rooms} Bedrooms
                       </div>
@@ -170,7 +155,7 @@ export default async function PropertyPage(props) {
                     {property?.bothrooms && (
                       <div className="listing-card-info-icon">
                         <div className="inc-fleat-icon me-1">
-                          <img src="/images/bathtub.svg" width="13" alt="" />
+                          <img src="/property/images/bathtub.svg" width="13" alt="" />
                         </div>
                         {property?.bothrooms} Bathrooms
                       </div>
@@ -179,7 +164,7 @@ export default async function PropertyPage(props) {
                     {property?.property_size && (
                       <div className="listing-card-info-icon">
                         <div className="inc-fleat-icon me-1">
-                          <img src="/images/move.svg" width="13" alt="" />
+                          <img src="/property/images/move.svg" width="13" alt="" />
                         </div>
                         {property?.property_size} Size
                       </div>
@@ -188,7 +173,7 @@ export default async function PropertyPage(props) {
                     {property?.land_size && (
                       <div className="listing-card-info-icon">
                         <div className="inc-fleat-icon me-1">
-                          <img src="/images/move.svg" width="13" alt="" />
+                          <img src="/property/images/move.svg" width="13" alt="" />
                         </div>
                         {property?.land_size} Sqft
                       </div>
@@ -211,21 +196,16 @@ export default async function PropertyPage(props) {
                 </div>
               </div>
 
-              <PropertyDetailClient
-      data={property}
-      propertyId={id}
-      token={token}
-    />
-
+              <PropertyDetailClient data={property} propertyId={id} />
             </div>
 
             <div className="col-lg-4 col-md-12 col-sm-12">
-              <DetailSidebar data={property}  propertyId={id}
-      token={token}/>
+              <DetailSidebar data={property} propertyId={id} />
             </div>
           </div>
         </div>
       </section>
-  </>
+    </>
   );
 }
+

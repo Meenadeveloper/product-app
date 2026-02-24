@@ -14,6 +14,7 @@ import Rating from "@mui/material/Rating";
 import { Visibility } from "@mui/icons-material";
 import Link from "next/link";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import useUserStore from "@/store/userStore";
 
 // Custom Lightbox Component
 const CustomLightbox = ({
@@ -198,8 +199,13 @@ const CustomLightbox = ({
 export default function PropertyDetailClient({
   data,
   propertyId,
-  token,
 }) {
+  const { profile, fetchProfile } = useUserStore();
+  const isAuthed = !!profile;
+
+  useEffect(() => {
+    fetchProfile?.();
+  }, [fetchProfile]);
 
   // Inside your component:
   const [isOpen, setIsOpen] = useState(false);
@@ -778,7 +784,7 @@ const handleRatingChange = (event, newValue) => {
         </div>
       </div>
 
-      {token && (
+      {isAuthed && (
         <div className="property_block_wrap style-2">
           <div className="property_block_wrap_header">
             <Link

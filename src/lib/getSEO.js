@@ -8,6 +8,7 @@ export async function getSEO(pageKey) {
     );
 
     return res?.data?.data || null;
+    console.log("SEO data:", res?.data?.data); // Debug log
   } catch (error) {
     console.error("SEO fetch failed:", error.message);
     return null;

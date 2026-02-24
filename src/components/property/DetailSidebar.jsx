@@ -24,9 +24,10 @@ function slugify(value) {
     .replace(/(^-|-$)+/g, "");
 }
 
-export default function DetailSidebar({ data, token, propertyId }) {
+export default function DetailSidebar({ data, propertyId }) {
   const router = useRouter();
   const { profile, fetchProfile } = useUserStore();
+  const isAuthed = !!profile;
 
   const [featureProperty, setFeatureProperty] = useState([]);
   const [showEnquiryModal, setShowEnquiryModal] = useState(false);
@@ -38,10 +39,8 @@ export default function DetailSidebar({ data, token, propertyId }) {
   });
 
   useEffect(() => {
-    if (token) {
-      fetchProfile?.();
-    }
-  }, [token, fetchProfile]);
+    fetchProfile?.();
+  }, [fetchProfile]);
 
  
 
@@ -82,7 +81,7 @@ export default function DetailSidebar({ data, token, propertyId }) {
     }\n`;
     const encodedMsg = encodeURIComponent(message);
 
-    if (!token) {
+    if (!isAuthed) {
       window.open(
         `https://wa.me/${whatsappNumber}?text=${encodedMsg}`,
         "_blank"
@@ -113,7 +112,7 @@ export default function DetailSidebar({ data, token, propertyId }) {
       return;
     }
 
-    if (!token) {
+    if (!isAuthed) {
       window.open(`tel:${phoneNumber}`, "_self");
       return;
     }
@@ -220,7 +219,7 @@ export default function DetailSidebar({ data, token, propertyId }) {
 
         <EnhancedAgentInfo data={data} />
 
-        {token && (
+        {isAuthed && (
           <div className="sides-widget">
             <div className="sides-widget-header " style={{background:"#ad3964"}}>
               <div className="sides-widget-details">

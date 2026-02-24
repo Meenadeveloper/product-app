@@ -24,7 +24,7 @@
 # Responsiveness Start
 # Bottom To top Scroll 
 ------------- List Of Table ----------*/
-
+/* 
 @import url(../css/plugins/animation.css);
 @import url(../css/plugins/css/bootstrap.min.css);
 @import url(../css/plugins/date-picker.css);
@@ -33,7 +33,9 @@
 @import url(../css/plugins/select2.css);
 @import url(../css/plugins/slick.css);
 @import url(../css/plugins/slick-theme.css);
-@import url(../css/plugins/magnific-popup.css);
+@import url(../css/plugins/magnific-popup.css); */
+
+
 /* @import url(../css/plugins/font-awesome.css); */
 /* @import url(../css/plugins/icofont.css); */
 @import url(../css/plugins/light-box.css);
@@ -216,7 +218,7 @@ p {
 }
 	
 .gray-bg{
-	background:#f7f9fc url("/images/pattern.png");
+	background:#f7f9fc url("/property/images/pattern.png");
 	background-size: cover;
     background-position: center;
 }
@@ -7126,7 +7128,7 @@ ul.list-gallery-inline li a {
 	position:relative;
 }
 .icon-features-wrap:before {
-    content:url("/images/arrow.png");
+    content:url("/property/images/arrow.png");
     position: absolute;
     width: auto;
     height: auto;
@@ -12112,3 +12114,4 @@ th.next.available, .prev.available {
     font-size: 12px;
     background-color: #f4f5f7;
 }
+

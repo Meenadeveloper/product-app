@@ -24,7 +24,7 @@ const Footer = () => {
             <div className="footer-widget">
               <Link href="/" className="nav-footer-logo">
                 <Image
-                  src="/images/logo.jpg"
+                  src="/property/images/logo.jpg"
                   alt="footer logo"
                   width={150}
                   height={120}
@@ -169,3 +169,4 @@ const Footer = () => {
 };
 
 export default Footer;
+

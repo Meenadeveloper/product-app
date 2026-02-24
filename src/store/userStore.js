@@ -9,15 +9,19 @@ const useUserStore = create((set) => ({
   error: null,
 
   fetchProfile: async () => {
-     set({ loading: true, error: null });
+    set({ loading: true, error: null });
     try {
       const data = await getProfile();
-      set({ profile: data?.data || data , loading: false });
-      console.log("Profile fetched successfully", data);
+      const profile = data?.data || data;
+      set({ profile, loading: false });
+      return { ok: true, data: profile };
     } catch (error) {
-            set({ error: error.message, loading: false });
-
-      console.error("Profile fetch failed", error);
+      set({
+        profile: null,
+        error: error?.message || "Failed to fetch profile",
+        loading: false,
+      });
+      return { ok: false, error };
     }
   },
 

@@ -1,7 +1,8 @@
 import "./globals.css";
-import "../styles/css/styles.css";
-import "../styles/css/colors.css";
+// import "../styles/css/styles.css";
+// import "../styles/css/colors.css";
 import Header from "@/components/ui/Header";
+import { Suspense } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Footer from "@/components/ui/footer";
@@ -18,7 +19,9 @@ export default function RootLayout({ children }) {
         suppressHydrationWarning
       >
           <ToastContainer position="top-right" />
-        <Header />
+        <Suspense fallback={null}>
+          <Header />
+        </Suspense>
         {children}
        <Footer/>
       </body>

@@ -230,7 +230,7 @@ export default function EnhancedAgentInfo({ data }) {
             
              <div style={{ marginRight: 12 }} >
             <Image
-              src={data?.agent?.profile_url || "/images/placeholder.png"}
+              src={data?.agent?.profile_url || "/property/images/placeholder.png"}
               alt={name}
               width={56}
               height={56}
@@ -321,7 +321,7 @@ export default function EnhancedAgentInfo({ data }) {
         <div className="d-flex align-items-center">
           <div style={{ marginRight: 12 }}>
             <Image
-              src="/images/user-6.jpg"
+              src="/property/images/user-6.jpg"
               alt={name}
               width={56}
               height={56}
@@ -347,3 +347,4 @@ export default function EnhancedAgentInfo({ data }) {
    
   );
 }
+
