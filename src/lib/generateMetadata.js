@@ -20,7 +20,7 @@ import { cache } from "react";
 
   const url =
     seo.url ||
-    `${process.env.NEXT_PUBLIC_SITE_URL}/property/${params.id}/${params.title}`;
+    `${process.env.NEXT_PUBLIC_SITE_URL}/${params.id}/${params.title}`;
 
   return {
     title: seo.title,

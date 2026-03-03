@@ -1,5 +1,6 @@
 import { API_ENDPOINTS } from "@/services/apiEndpoints";
 import axiosInstance, { apiForFiles } from "@/services/axiosInstance";
+import axios from "axios";
 
 /* --------------------------------------------------
    COMMON RESPONSE HANDLER
@@ -8,8 +9,12 @@ import axiosInstance, { apiForFiles } from "@/services/axiosInstance";
 const handleResponse = (res) => res.data;
 
 const handleError = (error) => {
-  console.error("API Error:", error?.response?.data || error.message);
-  throw error?.response?.data || error;
+  let errorData = error?.response?.data;
+  if (errorData && typeof errorData === "object" && Object.keys(errorData).length === 0) {
+    errorData = null;
+  }
+  console.error("API Error:", errorData || error.message || "Unknown error");
+  throw errorData || error;
 };
 
 /* --------------------------------------------------
@@ -18,7 +23,9 @@ const handleError = (error) => {
 
 export const registerUser = async (data) => {
   try {
-    const res = await axiosInstance.post(API_ENDPOINTS.REGISTER, data);
+    const res = await axiosInstance.post(API_ENDPOINTS.REGISTER, data, {
+      skipAuthRedirect: true,
+    });
     return handleResponse(res);
   } catch (error) {
     handleError(error);
@@ -27,7 +34,11 @@ export const registerUser = async (data) => {
 
 export const loginUser = async (data) => {
   try {
-    const res = await axiosInstance.post(API_ENDPOINTS.LOGIN, data);
+        await axios.get('https://www.unicorn.amrithaa.net/backend/sanctum/csrf-cookie', { withCredentials: true });
+
+    const res = await axiosInstance.post(API_ENDPOINTS.LOGIN, data, {
+      skipAuthRedirect: true,
+    });
     return handleResponse(res);
   } catch (error) {
     handleError(error);
@@ -47,7 +58,8 @@ export const sendForgetPasswordOtp = async (data) => {
   try {
     const res = await axiosInstance.post(
       API_ENDPOINTS.FORGET_PASSWORD_OTP_SEND,
-      data
+      data,
+      { skipAuthRedirect: true }
     );
     return handleResponse(res);
   } catch (error) {
@@ -59,7 +71,8 @@ export const verifyForgetPasswordOtp = async (data) => {
   try {
     const res = await axiosInstance.post(
       API_ENDPOINTS.FORGET_PASSWORD_VERIFY_OTP,
-      data
+      data,
+      { skipAuthRedirect: true }
     );
     return handleResponse(res);
   } catch (error) {
@@ -84,10 +97,21 @@ export const updateForgetPassword = async (data) => {
 -------------------------------------------------- */
 
 export const getProfile = async () => {
+  if (typeof window !== "undefined") {
+    const hasToken = document.cookie
+      .split(";")
+      .some((c) => c.trim().startsWith("access_token="));
+    if (!hasToken) return null;
+  }
   try {
-    const res = await axiosInstance.get(API_ENDPOINTS.PROFILE);
+    const res = await axiosInstance.get(API_ENDPOINTS.PROFILE, {
+      skipAuthRedirect: true,
+    });
     return handleResponse(res);
   } catch (error) {
+    if (error.response && error.response.status === 401) {
+      return null;
+    }
     handleError(error);
   }
 };

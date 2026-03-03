@@ -8,6 +8,7 @@ import {
   useSearchParams,
 } from "next/navigation";
 
+import Cookies from "js-cookie";
 import useUserStore from "@/store/userStore";
 import { fetchFilterMaster } from "@/services/propertyAPI";
 import axiosInstance from "@/services/axiosInstance";
@@ -33,11 +34,16 @@ const Header = ({ transparent = false }) => {
   /* ---------------- TOKEN CHECK ---------------- */
 
   useEffect(() => {
+    const token = Cookies.get("access_token");
+    if (token) {
+      setHasToken(true);
+    }
+
     let isMounted = true;
     const checkAuth = async () => {
       const result = await fetchProfile();
       if (isMounted) {
-        setHasToken(!!result?.ok);
+        setHasToken(!!result?.data);
       }
     };
     checkAuth();
@@ -178,7 +184,7 @@ const Header = ({ transparent = false }) => {
                   display: "block", // helps with layout
                   alignItems: "center",
                 }}>
-            <img src="/property/images/logo.png" alt="Logo"   style={{
+            <img src="/images/logo.png" alt="Logo"   style={{
                     maxHeight: "80px", // controls height of logo
                     maxWidth: "200px", // prevents horizontal overflow
                     width:"100%",
@@ -196,7 +202,7 @@ const Header = ({ transparent = false }) => {
                   <li>
                     {hasToken ? (
                       <Link href="/user/my-profile">
-                        <img src="/property/images/placeholder.png" alt="profile" />
+                        <img src="/images/placeholder.png" alt="profile" />
                       </Link>
                     ) : (
                       <button
@@ -264,26 +270,9 @@ const Header = ({ transparent = false }) => {
           </ul>
 
           {/* RIGHT SIDE */}
-           {!hasToken ? (
+           {hasToken ? (
                 <>
                   <ul className="nav-menu nav-menu-social align-to-right d-none d-lg-inline-flex gap-3">
-                   
-                    <li>
-                      <button
-                        className="unicorn-find-btn w-100"
-                        onClick={() => setLogin(true)}
-                      >
-                        Login
-                      </button>
-                    </li>
-                  </ul>
-                </>
-              ) : (
-                <>
-                  {" "}
-                  <ul className="nav-menu nav-menu-social align-to-right d-none d-lg-inline-flex">
-                    <ul className="nav-menu nav-menu-social align-to-right">
-                     
                       <li>
                         <div className="btn-group account-drop">
                           <button
@@ -301,7 +290,7 @@ const Header = ({ transparent = false }) => {
                               }}
                             >
                               <img
-                                src={profile?.profile_url || "/property/images/user.png"}
+                                src={profile?.profile_url || "/images/user.png"}
                                 className=""
                                 alt=""
                                 style={{
@@ -311,7 +300,7 @@ const Header = ({ transparent = false }) => {
                                 }}
                               />
                             </div>
-                            Hi, {profile?.name || "User"}
+                             {profile?.name || ""}
                           </button>
                           <div
                             className="dropdown-menu pull-right animated flipInX"
@@ -336,8 +325,27 @@ const Header = ({ transparent = false }) => {
                           </div>
                         </div>
                       </li>
-                    </ul>
                   </ul>
+                </>
+              ) : (
+                <>
+                  {" "}
+                 
+
+ <ul className="nav-menu nav-menu-social align-to-right d-none d-lg-inline-flex gap-3">
+                   
+                    <li>
+                      <button
+                        className="unicorn-find-btn w-100"
+                        onClick={() => setLogin(true)}
+                      >
+                        Login
+                      </button>
+                    </li>
+                  </ul>
+
+
+
                 </>
               )}
 
@@ -374,4 +382,3 @@ const Header = ({ transparent = false }) => {
 };
 
 export default Header;
-

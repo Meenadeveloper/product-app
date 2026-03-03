@@ -24,7 +24,7 @@ const Footer = () => {
             <div className="footer-widget">
               <Link href="/" className="nav-footer-logo">
                 <Image
-                  src="/property/images/logo.jpg"
+                  src="/images/logo.jpg"
                   alt="footer logo"
                   width={150}
                   height={120}

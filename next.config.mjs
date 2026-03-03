@@ -2,11 +2,12 @@
 const nextConfig = {
   /* config options here */
 
-   basePath: "/property",
-  assetPrefix: "/property",
+  //  basePath: "/property",
+  // assetPrefix: "/property",
   
   reactCompiler: true,
   // output: "export",
+  output: "standalone",
   images: {
     unoptimized: true,
   //    remotePatterns: [
